@@ -144,21 +144,31 @@ async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[TextCon
             return [TextContent(type="text", text="Error: Query is required")]
         
         try:
-            # Perform semantic search
-            results = vector_store.search(query, k=limit)
+            # Generate query embedding first
+            from sentence_transformers import SentenceTransformer
+            embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+            query_embedding = embedding_model.encode(query)
             
-            if not results:
+            # Perform semantic search
+            results = vector_store.search(query_embedding, n_results=limit)
+            
+            # Extract results from ChromaDB format
+            documents = results.get("documents", [[]])[0]
+            metadatas = results.get("metadatas", [[]])[0]
+            distances = results.get("distances", [[]])[0]
+            
+            if not documents:
                 return [TextContent(type="text", text="No relevant documents found for your query.")]
             
             # Format results
-            response_parts = [f"Found {len(results)} relevant results for query: '{query}'\n"]
+            response_parts = [f"Found {len(documents)} relevant results for query: '{query}'\n"]
             
-            for i, result in enumerate(results, 1):
+            for i, (doc, meta, distance) in enumerate(zip(documents, metadatas, distances), 1):
                 # Format results from vector store
                 response_parts.append(
                     f"\n--- Result {i} ---\n"
-                    f"Relevance Score: {result.get('distance', 'N/A')}\n"
-                    f"Content:\n{result['content']}\n"
+                    f"Relevance Score: {1 - distance:.3f}\n"
+                    f"Content:\n{doc}\n"
                 )
             
             return [TextContent(type="text", text="".join(response_parts))]
