@@ -1,4 +1,6 @@
 fastapi
+fastapi_mcp
+mcp
 uvicorn
 sqlalchemy
 pydantic

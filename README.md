@@ -181,6 +181,7 @@ If you want to run the services separately for development:
 
 1. Use the search functionality in the web interface
 2. Or integrate with Cursor using the MCP protocol
+3. Or integrate with Claude Desktop using the MCP protocol
 
 ### MCP Integration with Cursor
 
@@ -189,6 +190,39 @@ If you want to run the services separately for development:
 3. Add Custom MCP Server with URL: `http://localhost:8000/mcp/v1`
 4. Save the settings
 5. Now you can query your PDF knowledge base directly from Cursor
+
+### MCP Integration with Claude Desktop
+
+1. Install dependencies:
+   ```bash
+   uv pip install -r backend/requirements.txt
+   ```
+
+2. Add to your Claude Desktop configuration file:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+3. Configuration:
+   ```json
+   {
+     "mcpServers": {
+       "pdf-rag": {
+         "command": "python",
+         "args": ["/absolute/path/to/pdf-rag-mcp-server/mcp_server_entry.py"],
+         "cwd": "/absolute/path/to/pdf-rag-mcp-server"
+       }
+     }
+   }
+   ```
+
+4. Replace `/absolute/path/to/pdf-rag-mcp-server` with the actual path to your project directory
+
+5. Restart Claude Desktop
+
+6. You should now see MCP tools available in Claude Desktop for:
+   - Searching through your PDF documents
+   - Listing available documents
+   - Getting document information
 
 ## Troubleshooting
 
@@ -212,6 +246,7 @@ PdfRagMcpServer/
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── main.py        # Main FastAPI application
+│   │   ├── mcp_server.py  # MCP server for Claude Desktop
 │   │   ├── database.py    # Database models
 │   │   ├── pdf_processor.py # PDF processing logic
 │   │   ├── vector_store.py # Vector database interface
@@ -227,6 +262,7 @@ PdfRagMcpServer/
 │   │   └── App.jsx        # Main application component
 │   ├── package.json       # Frontend dependencies
 │   └── vite.config.js     # Vite configuration
+├── mcp_server_entry.py    # Entry point for Claude Desktop MCP
 ├── uploads/               # PDF file storage
 └── README.md              # This documentation
 ```
