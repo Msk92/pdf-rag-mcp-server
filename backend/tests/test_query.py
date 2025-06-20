@@ -26,7 +26,7 @@ async def test_vector_db():
         return
     
     # 2. Test queries
-    embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+    embedding_model = SentenceTransformer("intfloat/e5-large-v2")
     
     # Test several different queries
     test_queries = [

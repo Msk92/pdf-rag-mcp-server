@@ -146,8 +146,9 @@ async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[TextCon
         try:
             # Generate query embedding first
             from sentence_transformers import SentenceTransformer
-            embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-            query_embedding = embedding_model.encode(query)
+            embedding_model = SentenceTransformer("intfloat/e5-large-v2")
+            # Add "query: " prefix for e5-large-v2 model
+            query_embedding = embedding_model.encode(f"query: {query}")
             
             # Perform semantic search
             results = vector_store.search(query_embedding, n_results=limit)

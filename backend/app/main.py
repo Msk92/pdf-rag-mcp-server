@@ -38,7 +38,7 @@ mcp_app = FastAPI(title="MCP PDF Knowledge MCP Server")
 
 # Initialize processor and model
 pdf_processor = PDFProcessor()
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+embedding_model = SentenceTransformer("intfloat/e5-large-v2")
 vector_store = VectorStore()
 
 # Configure logging
@@ -350,7 +350,8 @@ async def query_knowledge_base(query: str):
     logger.info(f"Current vector database document count: {doc_count}")
     
     # Generate query embedding and search
-    query_embedding = embedding_model.encode(query)
+    # Add "query: " prefix for e5-large-v2 model
+    query_embedding = embedding_model.encode(f"query: {query}")
     results = vector_store.search(query_embedding, n_results=5)
     
     # Extract results

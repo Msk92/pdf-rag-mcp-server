@@ -42,7 +42,7 @@ class PDFProcessor:
             chunk_overlap=200,
             length_function=len,
         )
-        self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.embedding_model = SentenceTransformer("intfloat/e5-large-v2")
         self.vector_store = VectorStore()
         
     async def process_pdf(self, pdf_id: int, pdf_path: str, filename: str):
@@ -152,7 +152,9 @@ class PDFProcessor:
             
             # Generate embeddings - this is a compute-intensive task
             logger.info("Starting to generate embeddings")
-            embeddings = self.embedding_model.encode(chunks)
+            # Add "passage: " prefix for e5-large-v2 model
+            prefixed_chunks = [f"passage: {chunk}" for chunk in chunks]
+            embeddings = self.embedding_model.encode(prefixed_chunks)
             logger.info("Embeddings generation completed")
             
             # Update progress to 75%
